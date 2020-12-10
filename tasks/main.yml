@@ -1,0 +1,73 @@
+---
+- name: "Checking alertpusher binary exists"
+  stat:
+    path: '{{ alertpusher_install_dir }}/alertpusher'
+  register: alertpusher_binary
+
+- name: set_fact when system in key name
+  set_fact:
+    system_exists: true
+  loop: "{{ lookup('list', alertpusher_targets) }}"
+  when: "'system' in item.name"
+
+- when: system_exists|bool
+  block:
+    - name: "Propagate alertpusher binaries"
+      copy:
+        src: 'alertpusher'
+        dest: '{{ alertpusher_install_dir }}/alertpusher'
+        mode: '0755'
+        owner: root
+        group: root
+      notify: "restart alertpusher-system"
+
+- when: not alertpusher_binary.stat.exists and system_exists == false
+  block:
+    - name: "Clone repo alertpusher"
+      git:
+        repo: '{{ alertpusher_repo }}'
+        dest: '{{ alertpusher_src_dir }}'
+        force: true
+      become: false
+      delegate_to: localhost
+      run_once: true
+
+    - name: "Build source"
+      make:
+        chdir: '{{ alertpusher_src_dir }}'
+      become: false
+      delegate_to: localhost
+      run_once: true
+
+    - name: "Propagate alertpusher binaries"
+      copy:
+        src: '{{ alertpusher_src_dir }}/alertpusher-sensu'
+        dest: '{{ alertpusher_install_dir }}/alertpusher' 
+        mode: '0755'
+        owner: root
+        group: root
+
+    - name: "Remove source directory"
+      file:
+        path: '{{ alertpusher_src_dir }}'
+        state: absent
+      become: false
+      delegate_to: localhost
+      run_once: true
+
+- name: "Copy systemd init file"
+  template:
+    src: 'alertpusher.service.j2'
+    dest: '/etc/systemd/system/alertpusher-{{ item.name }}.service'
+    mode: '0640'
+  with_items:
+    - "{{ alertpusher_targets }}"
+
+- name: "Start alertpusher"
+  systemd:
+    state: started
+    enabled: yes
+    daemon_reload: yes
+    name: "alertpusher-{{ item.name }}"
+  with_items:
+    - "{{ alertpusher_targets }}"

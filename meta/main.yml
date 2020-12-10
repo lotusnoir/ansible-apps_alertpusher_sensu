@@ -1,0 +1,23 @@
+---
+galaxy_info:
+  author: "Philippe leal"
+  description: "Install and configure alertpusher to send prometheurs alertmanager event to sensu uchiwa"
+  role_name: apps_alertpusher
+  license: "license: Apache License, Version 2.0"
+  min_ansible_version: 2.8
+
+  platforms:
+    - name: "Ubuntu"
+      versions:
+        - all
+    - name: "Debian"
+      versions:
+        - all
+
+  galaxy_tags:
+    - alertmanager
+    - sensu
+    - uchiwa
+    - prometheus
+
+dependencies: []

@@ -1,0 +1,5 @@
+---
+- name: "restart alertpusher-system"
+  service:
+    name: alertpusher-system
+    state: restarted

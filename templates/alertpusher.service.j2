@@ -1,0 +1,23 @@
+[Unit]
+Description= Alertpusher {{ item.name }}
+After=network-online.target
+StartLimitInterval=0
+
+[Service]
+Type=simple
+Environment=http_proxy=
+ExecStart={{ alertpusher_install_dir }}/alertpusher \
+{% if alertpusher_debug is defined and alertpusher_debug is sameas true %}        --debug \
+{% endif %}
+          --sensu-api-port={{ alertpusher_sensu_api_port }} \
+          --sensu-client-port={{ alertpusher_sensu_client_port }} \
+          --port={{ item.port }} \
+          --sensu-host={{ item.host }}
+KillMode=control-group
+KillSignal=TERM
+Restart=always
+RestartSec=3
+MemoryHigh=50M
+
+[Install]
+WantedBy=multi-user.target
