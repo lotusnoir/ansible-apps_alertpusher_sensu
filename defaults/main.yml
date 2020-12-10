@@ -5,7 +5,7 @@ alertpusher_install_dir: '/usr/local/bin'
 alertpusher_src_dir: "/tmp/alertpusher/"
 
 # Systemd options
-alertpusher_debug: true
+alertpusher_debug: false
 alertpusher_sensu_client_port: 3030
 alertpusher_sensu_api_port: 4567
 alertpusher_targets:

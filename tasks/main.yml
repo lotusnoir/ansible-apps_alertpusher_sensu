@@ -4,24 +4,24 @@
     path: '{{ alertpusher_install_dir }}/alertpusher'
   register: alertpusher_binary
 
-- name: set_fact when system in key name
-  set_fact:
-    system_exists: true
-  loop: "{{ lookup('list', alertpusher_targets) }}"
-  when: "'system' in item.name"
+#- name: set_fact when system in key name
+#  set_fact:
+#    system_exists: true
+#  loop: "{{ lookup('list', alertpusher_targets) }}"
+#  when: "'system' in item.name"
+#
+#- when: system_exists|bool
+#  block:
+#    - name: "Propagate alertpusher binaries"
+#      copy:
+#        src: 'alertpusher'
+#        dest: '{{ alertpusher_install_dir }}/alertpusher'
+#        mode: '0755'
+#        owner: root
+#        group: root
+#      notify: "restart alertpusher-system"
 
-- when: system_exists|bool
-  block:
-    - name: "Propagate alertpusher binaries"
-      copy:
-        src: 'alertpusher'
-        dest: '{{ alertpusher_install_dir }}/alertpusher'
-        mode: '0755'
-        owner: root
-        group: root
-      notify: "restart alertpusher-system"
-
-- when: not alertpusher_binary.stat.exists and system_exists == false
+- when: not alertpusher_binary.stat.exists
   block:
     - name: "Clone repo alertpusher"
       git:
@@ -42,7 +42,7 @@
     - name: "Propagate alertpusher binaries"
       copy:
         src: '{{ alertpusher_src_dir }}/alertpusher-sensu'
-        dest: '{{ alertpusher_install_dir }}/alertpusher' 
+        dest: '{{ alertpusher_install_dir }}/alertpusher'
         mode: '0755'
         owner: root
         group: root
