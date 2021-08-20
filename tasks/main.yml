@@ -64,10 +64,10 @@
     - "{{ alertpusher_targets }}"
 
 - name: "Start alertpusher"
-  systemd:
+  service:
     state: started
-    enabled: yes
-    daemon_reload: yes
+    enabled: true
+    daemon_reload: true
     name: "alertpusher-{{ item.name }}"
   with_items:
     - "{{ alertpusher_targets }}"
