@@ -59,7 +59,7 @@
   template:
     src: 'alertpusher.service.j2'
     dest: '/etc/systemd/system/alertpusher-{{ item.name }}.service'
-    mode: '0640'
+    mode: '0644'
   with_items:
     - "{{ alertpusher_targets }}"
 
